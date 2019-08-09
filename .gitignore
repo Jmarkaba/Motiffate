@@ -1,0 +1,9 @@
+# Data (images and csv)
+data/*
+testing/*
+
+# Misc
+.vscode/*
+__pycache__/*
+*/.vscode/*
+*/__pycache__/*
