@@ -28,7 +28,7 @@ oxygen exchange occurs in
 Usage
 ===============
 Python v. 3.6.8
-Note: All input image files must be TIFF files (.tif/.tiff)
+**Note: All input image files must be TIFF files (.tif/.tiff). All data files of atom column positions  must be CSV (.csv) format.**
 
 Install pip dependencies
 `pip install -r requirements.txt` or `python -m pip install -r requirements.txt` for certain Windows users
@@ -36,4 +36,9 @@ Install pip dependencies
 Run the script (should act like a console for manipulating data)
 `python main.py`
 
-*Work in Progress*
+Examples
+===============
+![Single frame graph overlay of Pt on CeO2 rod in atmospheric N2](https://drive.google.com/open?id=12e_KlGYdAI1wEZyNkuFifd1UlKGQ6o47)
+
+
+***Work in Progress***
