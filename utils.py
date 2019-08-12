@@ -15,20 +15,14 @@ def saveStackAsTiff(graph_stack, inputTiff=None, outputTiff=None, connections=Tr
     if inputTiff != None:
         tiff = TiffSequence(inputTiff)
         multi = tiff.asarray()[0]
-        finalShape = len(graph_stack), *multi[0].shape
+        # finalShape = len(graph_stack), *multi[0].shape
         for cnt, graph in enumerate(graph_stack):
             oa = ObservableGraph(graph, image=multi[cnt], with_connections=connections, **kwargs)
-            combinedTiff.append(oa.getImage())
+            combinedTiff.append(oa.image())
     else:
         for cnt, graph in enumerate(graph_stack):
             oa = ObservableGraph(graph, with_connections=connections, **kwargs)
-            combinedTiff.append(oa.getImage())
+            combinedTiff.append(oa.image())
 
     combinedTiff = asarray(combinedTiff, dtype='float16')
     imsave(outputTiff, combinedTiff)
-
-
-## NEEDS TO BE IMPLEMENTED
-def atomListGenerator(df):
-    for row in df.iterrows():
-        yield(row)

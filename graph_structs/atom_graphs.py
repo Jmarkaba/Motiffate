@@ -3,7 +3,7 @@ from numpy import empty, full, uint8, amax
 from cv2 import line, circle, cvtColor, FILLED, COLOR_GRAY2RGB
 from skimage.io import imshow, show
 from graph_structs.linsolve import intersects
-from graph_structs.variables import MAX_BOND_LENGTH
+from variables import MAX_BOND_LENGTH, AMPLITUDE
 
 class _Node:
 
@@ -36,7 +36,7 @@ class _Node:
     def getType(self):
         return self._atom_type
     
-    def setType(self, _atom_type):
+    def setType(self, atom_type):
         # atom_type should be a string
         # e.g., 'Pt'
         self._atom_type = str.lower(atom_type) if atom_type else None
@@ -79,9 +79,7 @@ class Graph:
             return self[e[0]].getPosition(), self[e[1]].getPosition()
         for edge in edge_set:
             for other_edge in edge_set:
-                continue
-                if edge != other_edge and edge[0] != other_edge[1] and \
-                    intersects(*e2ps(edge), *e2ps(other_edge)):
+                if edge != other_edge and edge[0] != other_edge[1] and intersects(*e2ps(edge), *e2ps(other_edge)):
                     pass
 
     def __getitem__(self, i):
@@ -112,42 +110,38 @@ class Graph:
 
 
 
-class ObservableGraph:
+class ObservableGraph(Graph):
 
-    def __init__(self, graph, image=full((512,512,3), 0, dtype=uint8), with_connections=True, **kwargs):
-        self._graph = graph
+    def __init__(self, atom_list=[], image=full((512,512,3), 0, dtype=uint8), with_connections=False, **kwargs):
+        Graph.__init__(atom_list)
+
         self._image = cvtColor(image, COLOR_GRAY2RGB) if len(image.shape) == 2 else image
-        self._white = (200, 200, 200)
-        self._pixel_size = image.shape[0]
+        max_pixel = amax(self._image)
+        self._white = (max_pixel, max_pixel, max_pixel)
+
         if with_connections: 
             self.drawConnections()
         self.drawVertices(**kwargs)
 
     def drawVertices(self, **kwargs):
-        for key, vertex in self._graph:
+        for key, vertex in self:
             if vertex.exists():
-                p = self.adaptPoint(vertex.getPosition())
+                p = vertex.getPosition()
                 color = kwargs['color_dict'][key] if 'color_dict' in kwargs and key in kwargs['color_dict'] else self._white
-                circle(self._image, p, 7, color, thickness=FILLED)
+                circle(self._image, p, AMPLITUDE, color, thickness=FILLED)
 
 
     def drawConnections(self):
-        for key, vertex in self._graph:
+        for key, vertex in self:
             for key in vertex.neighbors:
-                nbr = self._graph[key]
-                p1 = self.adaptPoint(vertex.getPosition())
-                p2 = self.adaptPoint(nbr.getPosition())
+                nbr = self[key]
+                p1 = vertex.getPosition()
+                p2 = nbr.getPosition()
                 line(self._image, p1, p2, self._white, thickness=3)
-
-    def adaptPoint(self, p):
-        if(self._pixel_size == 512):
-            return tuple(map(lambda x: int(2*x), p))
-        else:
-            return int(p[0]), int(p[1])
         
     def observe(self):
         imshow(self._image)
         show()
 
-    def getImage(self):
+    def image(self):
         return self._image
