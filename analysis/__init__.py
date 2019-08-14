@@ -3,7 +3,8 @@ from analysis.columnDataTracking import trackIntensityChanges, trackPositionChan
 def buildPositionChangesDict(graph_stack, *args):
     if args.length > 0:
         return _buildTrackedPositionChangesDict(graph_stack, args)
-    else return _buildTrackedPositionChangesDict(graph_stack, graph_stack.keys())
+    else: 
+        return _buildTrackedPositionChangesDict(graph_stack, graph_stack.keys())
 
 def _buildTrackedPositionChangesDict(graph_stack, keys):
     pos_dict = {}
@@ -14,7 +15,8 @@ def _buildTrackedPositionChangesDict(graph_stack, keys):
 def buildVectorChangesDict(graph_stack, *args):
     if args.length > 0:
         return _buildTrackedVectorChangesDict(graph_stack, args)
-    else return _buildTrackedVectorChangesDict(graph_stack, graph_stack.keys())
+    else: 
+        return _buildTrackedVectorChangesDict(graph_stack, graph_stack.keys())
 
 def _buildTrackedVectorChangesDict(graph_stack, keys):
     vec_dict = {}
@@ -25,7 +27,8 @@ def _buildTrackedVectorChangesDict(graph_stack, keys):
 def buildIntensityChangesDict(graph_stack, *args):
     if args.length > 0:
         return _buildTrackedIntensityChangesDict(graph_stack, args)
-    else return _buildTrackedIntensityChangesDict(graph_stack, graph_stack.keys())
+    else: 
+        return _buildTrackedIntensityChangesDict(graph_stack, graph_stack.keys())
 
 def _buildTrackedIntensityChangesDict(graph_stack, keys):
     int_dict = {}

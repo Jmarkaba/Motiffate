@@ -112,13 +112,15 @@ class Graph:
 
 class ObservableGraph(Graph):
 
-    def __init__(self, atom_list=[], image=full((512,512,3), 0, dtype=uint8), with_connections=False, **kwargs):
+    def __init__(self, atom_list=[], image=full((512,512,3), 0, dtype=uint8)):
         Graph.__init__(atom_list)
-
-        self._image = cvtColor(image, COLOR_GRAY2RGB) if len(image.shape) == 2 else image
+        self._original_image = image
         max_pixel = amax(self._image)
         self._white = (max_pixel, max_pixel, max_pixel)
 
+    def draw(with_connections=False, **kwargs):
+        image = self._original_image.copy()
+        self._image = cvtColor(image, COLOR_GRAY2RGB) if len(image.shape) == 2 else image
         if with_connections: 
             self.drawConnections()
         self.drawVertices(**kwargs)
@@ -140,8 +142,9 @@ class ObservableGraph(Graph):
                 line(self._image, p1, p2, self._white, thickness=3)
         
     def observe(self):
-        imshow(self._image)
-        show()
+        if self._image:
+            imshow(self._image)
+            show()
 
     def image(self):
         return self._image
