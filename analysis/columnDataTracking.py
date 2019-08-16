@@ -5,7 +5,8 @@ def trackPositionChanges(v_id, graph_stack):
     positionChanges[0] = 0
     for k in range(len(graph_stack)-1):
         if graph_stack[k+1][v_id].exists() and graph_stack[k][v_id].exists():
-            a, b = graph_stack[k+1][v_id].getPosition(), graph_stack[k][v_id].getPosition()
+            a = numpy.asarray(graph_stack[k+1][v_id].getPosition())
+            b = numpy.asarray(graph_stack[k][v_id].getPosition())
             posChange = numpy.linalg.norm(a-b)
             positionChanges[k+1] = posChange
         else:
@@ -17,7 +18,9 @@ def trackVectorChanges(v_id, graph_stack):
     vectorChanges[0] = numpy.zeros((2,))
     for k in range(len(graph_stack)-1):
         if graph_stack[k+1][v_id].exists() and graph_stack[k][v_id].exists():
-            vec = numpy.subtract(graph_stack[k+1][v_id].getPosition(), graph_stack[k][v_id].getPosition)
+            a = numpy.asarray(graph_stack[k+1][v_id].getPosition())
+            b = numpy.asarray(graph_stack[k][v_id].getPosition())
+            vec = numpy.subtract(a, b)
             vectorChanges[k+1] = vec
         else:
             vectorChanges[k+1] = numpy.zeros((2,))

@@ -9,20 +9,10 @@ def readCSVData(filename):
     res = df[['image', 'atom_id', 'x_coordinate', 'y_coordinate', 'norm_integrated_intensity']]
     return res
 
-
-def saveStackAsTiff(graph_stack, inputTiff=None, outputTiff=None, connections=True, **kwargs):
-    combinedTiff = []
+def loadTiff(graph_stack, inputTiff=None):
     if inputTiff != None:
-        tiff = TiffSequence(inputTiff)
-        multi = tiff.asarray()[0]
-        # finalShape = len(graph_stack), *multi[0].shape
-        for cnt, graph in enumerate(graph_stack):
-            oa = ObservableGraph(graph, image=multi[cnt], with_connections=connections, **kwargs)
-            combinedTiff.append(oa.image())
-    else:
-        for cnt, graph in enumerate(graph_stack):
-            oa = ObservableGraph(graph, with_connections=connections, **kwargs)
-            combinedTiff.append(oa.image())
+        graph_stack.setImageStack(TiffSequence(inputTiff).asarray()[0])
 
-    combinedTiff = asarray(combinedTiff, dtype='float16')
+def saveStackAsTiff(graph_stack, outputTiff):
+    combinedTiff = asarray(graph_stack.getImageStack(), dtype='float16')
     imsave(outputTiff, combinedTiff)

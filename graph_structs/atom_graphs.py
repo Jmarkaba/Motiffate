@@ -1,9 +1,9 @@
 from numpy.linalg import norm
-from numpy import empty, full, uint8, amax
+from numpy import empty, full, uint8, amax, asarray
 from cv2 import line, circle, cvtColor, FILLED, COLOR_GRAY2RGB
 from skimage.io import imshow, show
 from graph_structs.linsolve import intersects
-from variables import MAX_BOND_LENGTH, AMPLITUDE
+from variables import MAX_BOND_LENGTH, RADIUS, white
 
 class _Node:
 
@@ -13,9 +13,7 @@ class _Node:
         self._x = kwargs['x'] if 'x' in kwargs else None
         self._y = kwargs['y'] if 'y' in kwargs else None
         if self._x and self._y:
-            self.position = empty((2,))
-            self.position[0] = self._x
-            self.position[1] = self._y
+            self.position = (self._x, self._y)
         else:
             self.position = None
         self.intensity = kwargs['intensity'] if 'intensity' in kwargs else 0
@@ -59,7 +57,7 @@ class Graph:
             else:
                 self.addVertex(int(atom[0]), x=atom[1], y=atom[2], intensity=atom[3])
         edge_set = self.keepNearestNeighbors()
-        self.removeLargerLatticeBonds(edge_set)
+        #self.removeLargerLatticeBonds(edge_set)
         
     def keepNearestNeighbors(self):
         edge_set = set()
@@ -67,7 +65,7 @@ class Graph:
             if not atom.exists(): continue
             for k, other in self:
                 if not other.exists(): continue
-                dist = norm(atom.getPosition() - other.getPosition())
+                dist = norm(asarray(atom.getPosition()) - asarray(other.getPosition()))
                 if dist < MAX_BOND_LENGTH and k not in atom:
                     self.addEdge(key, k, dist)
                     edge_set.add((key, k))
@@ -112,39 +110,52 @@ class Graph:
 
 class ObservableGraph(Graph):
 
-    def __init__(self, atom_list=[], image=full((512,512,3), 0, dtype=uint8)):
-        Graph.__init__(atom_list)
+    def __init__(self, atom_list):
+        Graph.__init__(self, atom_list)
+        self.max_pixel = 255
+        self._white = white(self.max_pixel)
+        self.img_loaded = False
+
+    def setImage(self, image):
         self._original_image = image
-        max_pixel = amax(self._image)
-        self._white = (max_pixel, max_pixel, max_pixel)
+        max_pixel = amax(self._original_image)
+        self.max_pixel = max_pixel
+        self._white = white(max_pixel)
+        self.img_loaded = True
 
-    def draw(with_connections=False, **kwargs):
-        image = self._original_image.copy()
-        self._image = cvtColor(image, COLOR_GRAY2RGB) if len(image.shape) == 2 else image
-        if with_connections: 
-            self.drawConnections()
-        self.drawVertices(**kwargs)
+    def draw(self, connections=False, **kwargs):
+        if self.img_loaded:
+            image = self._original_image.copy()
+            self._image = cvtColor(image, COLOR_GRAY2RGB) if len(image.shape) == 2 else image
+            if connections: 
+                self.drawConnections()
+            self.drawVertices(**kwargs)
 
-    def drawVertices(self, **kwargs):
+    def drawVertices(self, color_dict={}):
         for key, vertex in self:
             if vertex.exists():
-                p = vertex.getPosition()
-                color = kwargs['color_dict'][key] if 'color_dict' in kwargs and key in kwargs['color_dict'] else self._white
-                circle(self._image, p, AMPLITUDE, color, thickness=FILLED)
+                p = tuple(map(int, vertex.getPosition()))
+                color = color_dict[key](self.max_pixel) if key in color_dict else self._white
+                if color != self._white:
+                    print(color_dict)
+                    print(color)
+                circle(self._image, p, RADIUS, color, thickness=FILLED)
 
 
     def drawConnections(self):
         for key, vertex in self:
             for key in vertex.neighbors:
                 nbr = self[key]
-                p1 = vertex.getPosition()
-                p2 = nbr.getPosition()
+                p1 = tuple(map(int, vertex.getPosition()))
+                p2 = tuple(map(int, nbr.getPosition()))
                 line(self._image, p1, p2, self._white, thickness=3)
         
-    def observe(self):
-        if self._image:
-            imshow(self._image)
+    def observe(self, original):
+        if not original and self._image or original and self._original_image:
+            imshow(self._image if not original else self._original_image)
             show()
+        else:
+            return False
 
     def image(self):
         return self._image
