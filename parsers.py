@@ -74,11 +74,13 @@ plot_parser = subparsers.add_parser('show')
 plot_parser.add_argument(
     'index', 
     help='The index of the frame to view',
+    type=int
 )
 plot_parser.add_argument(
     '--original', 
     help='Specifies that the unaltered version should be viewed',
-    action='store_true'
+    action='store_true',
+    default=False
 )
 
 

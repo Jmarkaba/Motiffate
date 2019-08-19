@@ -115,6 +115,7 @@ class ObservableGraph(Graph):
         self.max_pixel = 255
         self._white = white(self.max_pixel)
         self.img_loaded = False
+        self._image = None
 
     def setImage(self, image):
         self._original_image = image
@@ -136,9 +137,6 @@ class ObservableGraph(Graph):
             if vertex.exists():
                 p = tuple(map(int, vertex.getPosition()))
                 color = color_dict[key](self.max_pixel) if key in color_dict else self._white
-                if color != self._white:
-                    print(color_dict)
-                    print(color)
                 circle(self._image, p, RADIUS, color, thickness=FILLED)
 
 
@@ -151,11 +149,12 @@ class ObservableGraph(Graph):
                 line(self._image, p1, p2, self._white, thickness=3)
         
     def observe(self, original):
-        if not original and self._image or original and self._original_image:
-            imshow(self._image if not original else self._original_image)
+        if self.img_loaded and original:
+            imshow(self._original_image)
             show()
         else:
-            return False
+            imshow(self._image)
+            show()
 
     def image(self):
         return self._image

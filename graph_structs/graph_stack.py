@@ -74,7 +74,6 @@ class GraphStack:
             self.drawAll(**self.drawKwargs)
         for graph in self:
             img_stack.append(graph.image())
-        print(len(img_stack))
         return img_stack
 
     def drawAll(self, **kwargs): 
@@ -87,7 +86,7 @@ class GraphStack:
         else:
             raise Exception('Observables are turned off')
     
-    def show(index, original=False):
+    def show(self, index, original=False):
         return self[index].observe(original)
 
     def __getitem__(self, i):
